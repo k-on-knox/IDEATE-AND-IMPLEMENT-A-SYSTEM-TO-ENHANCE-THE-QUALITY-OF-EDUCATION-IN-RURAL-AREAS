@@ -1,134 +1,565 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>SmartEdu — Project Summary</title>
-  <style>
-    :root{
-      --bg:#f6f8fb;
-      --card:#ffffff;
-      --accent:#0f62fe;
-      --muted:#6b7280;
-      --radius:12px;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-    }
-    body{
-      margin:0;
-      background:linear-gradient(180deg,var(--bg),#eef2ff);
-      color:#0f172a;
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-      padding:32px;
-    }
-    .container{
-      max-width:980px;
-      margin:0 auto;
-      display:grid;
-      grid-template-columns:1fr;
-      gap:18px;
-    }
-    header{
-      background:var(--card);
-      padding:20px 22px;
-      border-radius:var(--radius);
-      box-shadow:0 6px 18px rgba(15,22,42,0.06);
-      display:flex;
-      align-items:center;
-      gap:16px;
-    }
-    .logo{
-      width:56px;height:56px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#7c3aed);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:18px;
-    }
-    h1{font-size:20px;margin:0}
-    p.lead{margin:6px 0 0;color:var(--muted);font-size:14px}
-
-    .grid{
-      display:grid;grid-template-columns:repeat(2,1fr);gap:16px;
-    }
-    .card{
-      background:var(--card);
-      padding:18px;border-radius:12px;box-shadow:0 6px 18px rgba(15,22,42,0.04);
-    }
-    .card h2{margin:0 0 8px;font-size:16px}
-    .card p{margin:0;color:var(--muted);font-size:14px;line-height:1.45}
-    ul{margin:8px 0 0;padding-left:18px;color:var(--muted)}
-    li{margin:6px 0}
-
-    .full{grid-column:1/-1}
-    .steps{display:flex;flex-direction:column;gap:10px}
-    .step{
-      background:linear-gradient(180deg,#fff,#fbfdff);padding:12px;border-radius:10px;border:1px solid #eef2ff;font-size:14px;color:var(--muted);
-    }
-    footer{margin-top:6px;text-align:right;color:var(--muted);font-size:13px}
-
-    /* Responsive */
-    @media (max-width:820px){
-      .grid{grid-template-columns:1fr}
-    }
-  </style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Rural Education Enhancement System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Open+Sans:wght@300;400;600&display=swap">
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+    <style id="app-style">
+        :root {
+            --primary-color: #1a365d;
+            --secondary-color: #7c6c5a;
+            --accent-color: #4c9aff;
+            --light-bg: #f7f9fc;
+            --dark-text: #2d3748;
+            --light-text: #f8fafc;
+        }
+        
+        body {
+            font-family: 'Open Sans', sans-serif;
+            color: var(--dark-text);
+            scroll-behavior: smooth;
+        }
+        
+        h1, h2, h3, h4, h5 {
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .hero {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://img.freepik.com/premium-photo/kids-student-slum-poor-areas-school-generative-ai_928917-101.jpg');
+            background-size: cover;
+            background-position: center;
+            min-height: 80vh;
+        }
+        
+        .btn-primary {
+            background-color: var(--accent-color);
+            color: white;
+            padding: 0.75rem 2rem;
+            border-radius: 0.375rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+        
+        .btn-primary:hover {
+            background-color: #3d7ec9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nav-link {
+            position: relative;
+            color: var(--light-text);
+            font-weight: 500;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background-color: var(--accent-color);
+            transition: width 0.3s;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .feature-card {
+            transition: all 0.3s ease;
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .step-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .step-connector {
+            flex: 1;
+            height: 2px;
+            background: var(--primary-color);
+            margin: 0 10px;
+        }
+        
+        .testimonial-card {
+            background-color: white;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .testimonial-card:hover {
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .swiper-pagination-bullet-active {
+            background-color: var(--primary-color);
+        }
+        
+        .profile-img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .mobile-menu {
+            transition: transform 0.3s ease;
+            transform: translateX(-100%);
+        }
+        
+        .mobile-menu.open {
+            transform: translateX(0);
+        }
+        
+        footer {
+            background-color: var(--primary-color);
+            color: var(--light-text);
+        }
+        
+        @media (max-width: 768px) {
+            .hero {
+                min-height: 60vh;
+            }
+            
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .steps-container {
+                flex-direction: column;
+            }
+            
+            .step-connector {
+                width: 2px;
+                height: 20px;
+                margin: 10px 0;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <div class="logo">SE</div>
-      <div>
-        <h1>SmartEdu — Rural Education Enhancement</h1>
-        <p class="lead">Simple project summary to understand and build the system quickly.</p>
-      </div>
-    </header>
-
-    <section class="grid">
-      <article class="card">
-        <h2>Project Name</h2>
-        <p><strong>SmartEdu</strong> — A low-cost, offline-first system to improve the quality of education in rural schools.</p>
-      </article>
-
-      <article class="card">
-        <h2>Goal</h2>
-        <p>Improve learning outcomes by giving students and teachers easy-to-use digital tools that work without reliable internet.</p>
-      </article>
-
-      <article class="card full">
-        <h2>How it Works</h2>
-        <p>Students use a simple Android app (local language) with lessons, audio/video and quizzes that save progress offline. Teachers use a companion app for attendance, lesson plans and grading. Data syncs to a local Raspberry Pi server and uploads to the cloud when internet is available.</p>
-      </article>
-
-      <article class="card">
-        <h2>Key Features</h2>
-        <ul>
-          <li>Offline learning app: lessons, quizzes, progress tracking.</li>
-          <li>Teacher portal: attendance, lesson assignment, simple reports.</li>
-          <li>Admin dashboard: attendance & learning metrics.</li>
-          <li>Low-bandwidth sync and local language support.</li>
-        </ul>
-      </article>
-
-      <article class="card">
-        <h2>Design Principles</h2>
-        <ul>
-          <li>Low-cost hardware (shared tablets or low-end phones).</li>
-          <li>Offline-first with periodic sync.</li>
-          <li>Simple UI and localization.</li>
-          <li>Privacy: minimal personal data stored locally.</li>
-        </ul>
-      </article>
-
-      <article class="card full">
-        <h2>Steps to Build (Quick)</h2>
-        <div class="steps">
-          <div class="step"><strong>1. Plan Content</strong> — Collect syllabus and create 10–20 lessons (text/audio/video).</div>
-          <div class="step"><strong>2. Build Student App</strong> — Use Flutter or Android to make an offline lesson viewer + quizzes.</div>
-          <div class="step"><strong>3. Build Teacher App</strong> — Add attendance, assign lessons, view class progress.</div>
-          <div class="step"><strong>4. Set Up Raspberry Pi</strong> — Local sync hub for devices in the school.</div>
-          <div class="step"><strong>5. Create Admin Dashboard</strong> — Simple web portal to see reports and manage content.</div>
-          <div class="step"><strong>6. Pilot & Iterate</strong> — Test in 1–2 schools, collect feedback, improve.</div>
+    <!-- Header & Navigation -->
+    <header class="fixed w-full bg-opacity-90 bg-gray-900 z-50 py-4">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <a href="javascript:void(0)" class="flex items-center space-x-2">
+                <div class="text-white text-2xl font-bold">
+                    <span class="text-blue-400">Rural</span>Learn
+                </div>
+            </a>
+            
+            <nav class="hidden md:flex space-x-8">
+                <a href="javascript:void(0)" class="nav-link">Home</a>
+                <a href="javascript:void(0)" class="nav-link">Features</a>
+                <a href="javascript:void(0)" class="nav-link">Resources</a>
+                <a href="javascript:void(0)" class="nav-link">Support</a>
+                <a href="javascript:void(0)" class="nav-link">Contact</a>
+            </nav>
+            
+            <button class="md:hidden text-white" id="mobile-menu-button">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
         </div>
-      </article>
-
+    </header>
+    
+    <!-- Mobile Menu -->
+    <div class="mobile-menu fixed top-0 left-0 w-full h-screen bg-gray-900 z-40 md:hidden" id="mobile-menu">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-8">
+                <a href="javascript:void(0)" class="flex items-center space-x-2">
+                    <div class="text-white text-2xl font-bold">
+                        <span class="text-blue-400">Rural</span>Learn
+                    </div>
+                </a>
+                <button class="text-white" id="mobile-menu-close">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="flex flex-col space-y-6">
+                <a href="javascript:void(0)" class="text-white text-lg">Home</a>
+                <a href="javascript:void(0)" class="text-white text-lg">Features</a>
+                <a href="javascript:void(0)" class="text-white text-lg">Resources</a>
+                <a href="javascript:void(0)" class="text-white text-lg">Support</a>
+                <a href="javascript:void(0)" class="text-white text-lg">Contact</a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Hero Section -->
+    <section class="hero flex items-center justify-center">
+        <div class="container mx-auto px-4 text-center text-white pt-20">
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-4" data-aos="fade-up">Empowering Rural Learners—Anytime, Anywhere</h1>
+            <p class="text-xl md:text-2xl mb-8 max-w-3xl mx-auto" data-aos="fade-up" data-aos-delay="200">Download lessons, take quizzes, and connect live with tutors even offline.</p>
+            <a href="javascript:void(0)" class="btn-primary mt-4 text-lg" data-aos="fade-up" data-aos-delay="300">Get Started Free</a>
+            <div class="mt-4 text-sm" data-aos="fade-up" data-aos-delay="400">
+                <label class="flex items-center justify-center cursor-pointer">
+                    <input type="checkbox" class="form-checkbox h-4 w-4 text-blue-500" id="remember-me">
+                    <span class="ml-2">Remember me</span>
+                </label>
+            </div>
+        </div>
     </section>
+    
+    <!-- Features Section -->
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12" data-aos="fade-up">Key Features</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 feature-grid">
+                <!-- Feature 1 -->
+                <div class="feature-card bg-gray-50 p-6 shadow" data-aos="fade-up">
+                    <div class="text-4xl text-blue-600 mb-4">
+                        <i class="fas fa-download"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Offline & Downloadable Content</h3>
+                    <p class="text-gray-600">Access educational materials anytime, anywhere—even without internet. Download lessons ahead of time for uninterrupted learning.</p>
+                </div>
+                
+                <!-- Feature 2 -->
+                <div class="feature-card bg-gray-50 p-6 shadow" data-aos="fade-up" data-aos-delay="200">
+                    <div class="text-4xl text-blue-600 mb-4">
+                        <i class="fas fa-question-circle"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Interactive Quizzes</h3>
+                    <p class="text-gray-600">Self-assess your understanding with interactive quizzes that work offline and sync results when connectivity returns.</p>
+                </div>
+                
+                <!-- Feature 3 -->
+                <div class="feature-card bg-gray-50 p-6 shadow" data-aos="fade-up" data-aos-delay="400">
+                    <div class="text-4xl text-blue-600 mb-4">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Live Tutoring</h3>
+                    <p class="text-gray-600">Connect with qualified educators when online for personalized guidance and support on challenging topics.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- How It Works -->
+    <section class="py-16 bg-gray-100">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12" data-aos="fade-up">How It Works</h2>
+            
+            <div class="flex md:flex-row flex-col items-center justify-between max-w-4xl mx-auto steps-container">
+                <!-- Step 1 -->
+                <div class="flex flex-col items-center text-center mb-6 md:mb-0" data-aos="fade-right">
+                    <div class="step-icon mb-4">1</div>
+                    <h3 class="font-bold text-xl mb-2">Sign up & download resources</h3>
+                    <p class="text-gray-600 max-w-xs">Create an account and download lesson materials when you have internet access.</p>
+                </div>
+                
+                <!-- Connector -->
+                <div class="step-connector" data-aos="fade-up" data-aos-delay="100"></div>
+                
+                <!-- Step 2 -->
+                <div class="flex flex-col items-center text-center mb-6 md:mb-0" data-aos="fade-up">
+                    <div class="step-icon mb-4">2</div>
+                    <h3 class="font-bold text-xl mb-2">Complete assessments offline</h3>
+                    <p class="text-gray-600 max-w-xs">Study materials and take quizzes at your own pace, even without internet.</p>
+                </div>
+                
+                <!-- Connector -->
+                <div class="step-connector" data-aos="fade-up" data-aos-delay="100"></div>
+                
+                <!-- Step 3 -->
+                <div class="flex flex-col items-center text-center" data-aos="fade-left">
+                    <div class="step-icon mb-4">3</div>
+                    <h3 class="font-bold text-xl mb-2">Connect with tutors when online</h3>
+                    <p class="text-gray-600 max-w-xs">Get personalized help from educators when you have internet connection.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- User Roles Showcase -->
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12" data-aos="fade-up">Who Benefits</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Student Profile -->
+                <div class="text-center" data-aos="fade-up">
+                    <img src="https://cdn.pixabay.com/photo/2016/11/29/06/46/adult-1867889_1280.jpg" alt="Student" class="profile-img mx-auto mb-4">
+                    <h3 class="text-xl font-bold mb-2">Student</h3>
+                    <p class="italic text-gray-600 mb-4">"The offline lessons helped me continue learning even when our village lost power for three days."</p>
+                    <div class="bg-blue-100 text-blue-800 px-4 py-2 rounded-full inline-block">
+                        <span class="font-bold">85%</span> improved test scores
+                    </div>
+                </div>
+                
+                <!-- Teacher Profile -->
+                <div class="text-center" data-aos="fade-up" data-aos-delay="200">
+                    <img src="https://cdn.pixabay.com/photo/2018/01/17/07/06/laptop-3087585_1280.jpg" alt="Teacher" class="profile-img mx-auto mb-4">
+                    <h3 class="text-xl font-bold mb-2">Teacher</h3>
+                    <p class="italic text-gray-600 mb-4">"I can now reach students in remote areas and track their progress when they reconnect online."</p>
+                    <div class="bg-blue-100 text-blue-800 px-4 py-2 rounded-full inline-block">
+                        <span class="font-bold">3x</span> student engagement
+                    </div>
+                </div>
+                
+                <!-- Volunteer Profile -->
+                <div class="text-center" data-aos="fade-up" data-aos-delay="400">
+                    <img src="https://cdn.pixabay.com/photo/2017/11/02/14/27/model-2911330_1280.jpg" alt="Volunteer" class="profile-img mx-auto mb-4">
+                    <h3 class="text-xl font-bold mb-2">Volunteer</h3>
+                    <p class="italic text-gray-600 mb-4">"The platform makes it easy to share my knowledge with students who wouldn't otherwise have access to specialized topics."</p>
+                    <div class="bg-blue-100 text-blue-800 px-4 py-2 rounded-full inline-block">
+                        <span class="font-bold">500+</span> volunteer hours
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Testimonials Section -->
+    <section class="py-16 bg-gray-100">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12" data-aos="fade-up">Testimonials & Impact</h2>
+            
+            <div class="swiper testimonialSwiper" data-aos="fade-up">
+                <div class="swiper-wrapper">
+                    <!-- Testimonial 1 -->
+                    <div class="swiper-slide p-4">
+                        <div class="testimonial-card p-6">
+                            <div class="flex items-center mb-4">
+                                <img src="https://cdn.pixabay.com/photo/2019/11/03/20/11/portrait-4599553_1280.jpg" alt="Village Head" class="w-12 h-12 rounded-full object-cover">
+                                <div class="ml-4">
+                                    <h4 class="font-bold">Raj Kumar</h4>
+                                    <p class="text-sm text-gray-600">Village Head, Madhya Pradesh</p>
+                                </div>
+                            </div>
+                            <p class="text-gray-700">"This program has transformed our village school. Children who previously had limited access to quality education now have resources comparable to city schools."</p>
+                            <div class="mt-4 text-blue-600 font-semibold">
+                                95% increase in school attendance
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Testimonial 2 -->
+                    <div class="swiper-slide p-4">
+                        <div class="testimonial-card p-6">
+                            <div class="flex items-center mb-4">
+                                <img src="https://cdn.pixabay.com/photo/2018/01/15/07/52/woman-3083401_1280.jpg" alt="Student" class="w-12 h-12 rounded-full object-cover">
+                                <div class="ml-4">
+                                    <h4 class="font-bold">Priya Singh</h4>
+                                    <p class="text-sm text-gray-600">Student, Grade 10</p>
+                                </div>
+                            </div>
+                            <p class="text-gray-700">"I can now prepare for my exams even when there's no internet. The offline quizzes help me practice, and I can ask questions to tutors when I'm online."</p>
+                            <div class="mt-4 text-blue-600 font-semibold">
+                                Ranked top 5% in state exams
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Testimonial 3 -->
+                    <div class="swiper-slide p-4">
+                        <div class="testimonial-card p-6">
+                            <div class="flex items-center mb-4">
+                                <img src="https://cdn.pixabay.com/photo/2018/04/27/03/50/woman-3353699_1280.jpg" alt="Education Officer" class="w-12 h-12 rounded-full object-cover">
+                                <div class="ml-4">
+                                    <h4 class="font-bold">Dr. Anita Sharma</h4>
+                                    <p class="text-sm text-gray-600">District Education Officer</p>
+                                </div>
+                            </div>
+                            <p class="text-gray-700">"The data insights we get from this platform have helped us identify learning gaps and allocate resources more effectively across rural schools."</p>
+                            <div class="mt-4 text-blue-600 font-semibold">
+                                Supporting 120+ rural schools
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="swiper-pagination mt-8"></div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Call to Action -->
+    <section class="py-20 bg-gradient-to-r from-blue-800 to-indigo-900 text-white">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl md:text-4xl font-bold mb-6" data-aos="fade-up">Ready to Transform Rural Education?</h2>
+            <p class="text-xl mb-8 max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="200">Join thousands of students, teachers, and volunteers making quality education accessible in remote areas.</p>
+            <a href="javascript:void(0)" class="btn-primary bg-white text-blue-800 text-lg" data-aos="fade-up" data-aos-delay="300">Get Started Free</a>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- Logo and Mission -->
+                <div>
+                    <div class="text-white text-2xl font-bold mb-4">
+                        <span class="text-blue-400">Rural</span>Learn
+                    </div>
+                    <p class="text-gray-300 mb-4">Empowering rural communities with accessible quality education.</p>
+                    <div class="flex space-x-4">
+                        <a href="javascript:void(0)" class="text-gray-300 hover:text-white">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="javascript:void(0)" class="text-gray-300 hover:text-white">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="javascript:void(0)" class="text-gray-300 hover:text-white">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="javascript:void(0)" class="text-gray-300 hover:text-white">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Resources -->
+                <div>
+                    <h3 class="text-lg font-bold mb-4 text-white">Resources</h3>
+                    <ul class="space-y-2">
+                        <li><a href="javascript:void(0)" class="text-gray-300 hover:text-white">Student Guide</a></li>
+                        <li><a href="javascript:void(0)" class="text-gray-300 hover:text-white">Teacher Resources</a></li>
+                        <li><a href="javascript:void(0)" class="text-gray-300 hover:text-white">Volunteer Program</a></li>
+                        <li><a href="javascript:void(0)" class="text-gray-300 hover:text-white">Community Forum</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Links -->
+                <div>
+                    <h3 class="text-lg font-bold mb-4 text-white">Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="javascript:void(0)" class="text-gray-300 hover:text-white">About Us</a></li>
+                        <li><a href="javascript:void(0)" class="text-gray-300 hover:text-white">Partners</a></li>
+                        <li><a href="javascript:void(0)" class="text-gray-300 hover:text-white">Careers</a></li>
+                        <li><a href="javascript:void(0)" class="text-gray-300 hover:text-white">Blog</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Contact -->
+                <div>
+                    <h3 class="text-lg font-bold mb-4 text-white">Contact</h3>
+                    <ul class="space-y-2">
+                        <li class="flex items-center text-gray-300">
+                            <i class="fas fa-envelope w-6"></i>
+                            <span>contact@rurallearn.org</span>
+                        </li>
+                        <li class="flex items-center text-gray-300">
+                            <i class="fas fa-phone-alt w-6"></i>
+                            <span>+91 1234567890</span>
+                        </li>
+                        <li class="flex items-center text-gray-300">
+                            <i class="fas fa-map-marker-alt w-6"></i>
+                            <span>New Delhi, India</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-700 mt-12 pt-8 flex flex-col md:flex-row justify-between">
+                <p class="text-gray-400 text-sm">© 2025 RuralLearn. All rights reserved.</p>
+                <div class="mt-4 md:mt-0 space-x-6 text-sm">
+                    <a href="javascript:void(0)" class="text-gray-400 hover:text-white">Privacy Policy</a>
+                    <a href="javascript:void(0)" class="text-gray-400 hover:text-white">Terms of Use</a>
+                    <a href="javascript:void(0)" class="text-gray-400 hover:text-white">Accessibility</a>
+                </div>
+            </div>
+        </div>
+    </footer>
 
-    <footer>Need this exported as a standalone .html file or want a more detailed page? Let me know.</footer>
-  </div>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+    <script id="app-script">
+        // Initialize AOS (Animate On Scroll)
+        document.addEventListener('DOMContentLoaded', function() {
+            AOS.init({
+                duration: 800,
+                easing: 'ease',
+                once: true,
+                offset: 100
+            });
+            
+            // Mobile menu toggle
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenuCloseButton = document.getElementById('mobile-menu-close');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            mobileMenuButton.addEventListener('click', function() {
+                mobileMenu.classList.add('open');
+            });
+            
+            mobileMenuCloseButton.addEventListener('click', function() {
+                mobileMenu.classList.remove('open');
+            });
+            
+            // Initialize Testimonials Slider
+            const swiper = new Swiper('.testimonialSwiper', {
+                slidesPerView: 1,
+                spaceBetween: 30,
+                pagination: {
+                    el: '.swiper-pagination',
+                    clickable: true,
+                },
+                breakpoints: {
+                    640: {
+                        slidesPerView: 1,
+                    },
+                    768: {
+                        slidesPerView: 2,
+                    },
+                    1024: {
+                        slidesPerView: 3,
+                    },
+                },
+            });
+            
+            // Remember Me functionality using localStorage
+            const rememberMeCheckbox = document.getElementById('remember-me');
+            
+            // Check if user preference was stored previously
+            if (localStorage.getItem('rememberedUser') === 'true') {
+                rememberMeCheckbox.checked = true;
+            }
+            
+            rememberMeCheckbox.addEventListener('change', function() {
+                if (this.checked) {
+                    localStorage.setItem('rememberedUser', 'true');
+                } else {
+                    localStorage.removeItem('rememberedUser');
+                }
+            });
+            
+            // Header scroll effect
+            const header = document.querySelector('header');
+            
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 50) {
+                    header.classList.add('bg-opacity-100');
+                    header.classList.add('shadow-md');
+                } else {
+                    header.classList.remove('bg-opacity-100');
+                    header.classList.remove('shadow-md');
+                }
+            });
+        });
+    </script>
 </body>
 </html>
