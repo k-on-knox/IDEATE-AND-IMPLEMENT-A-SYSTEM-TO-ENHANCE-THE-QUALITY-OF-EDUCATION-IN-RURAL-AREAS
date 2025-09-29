@@ -1,0 +1,1811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rural Education Connect - Student Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style id="app-style">
+    :root {
+      --primary-color: #4f46e5;
+      --primary-light: #818cf8;
+      --accent-color: #f97316;
+      --success-color: #22c55e;
+      --error-color: #ef4444;
+      --text-dark: #1f2937;
+      --text-light: #f9fafb;
+      --bg-light: #ffffff;
+      --bg-dark: #111827;
+    }
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+    }
+    
+    .theme-young {
+      --primary-color: #8b5cf6;
+      --primary-light: #c4b5fd;
+      --accent-color: #f97316;
+    }
+    
+    .theme-older {
+      --primary-color: #2563eb;
+      --primary-light: #93c5fd;
+      --accent-color: #ea580c;
+    }
+    
+    .progress-bar {
+      height: 8px;
+      border-radius: 4px;
+      background-color: #e5e7eb;
+      overflow: hidden;
+    }
+    
+    .progress-bar-fill {
+      height: 100%;
+      background-color: var(--primary-color);
+      transition: width 0.5s ease-in-out;
+    }
+    
+    .badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      width: 18px;
+      height: 18px;
+      background-color: var(--error-color);
+      border-radius: 50%;
+      color: white;
+      font-size: 0.7rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .calendar-day {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+    
+    .calendar-day.present {
+      background-color: rgba(34, 197, 94, 0.2);
+      color: var(--success-color);
+    }
+    
+    .calendar-day.absent {
+      background-color: rgba(239, 68, 68, 0.2);
+      color: var(--error-color);
+    }
+    
+    .nav-link {
+      transition: all 0.2s ease;
+      border-radius: 0.5rem;
+    }
+    
+    .nav-link:hover {
+      background-color: rgba(79, 70, 229, 0.1);
+    }
+    
+    .nav-link.active {
+      background-color: var(--primary-color);
+      color: white;
+    }
+    
+    .nav-link .icon {
+      transition: transform 0.2s ease;
+    }
+    
+    .nav-link:hover .icon {
+      transform: scale(1.1);
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    .message-bubble {
+      max-width: 80%;
+      padding: 10px 15px;
+      border-radius: 18px;
+      margin-bottom: 10px;
+      word-wrap: break-word;
+    }
+    
+    .message-sent {
+      background-color: var(--primary-color);
+      color: white;
+      margin-left: auto;
+      border-bottom-right-radius: 5px;
+    }
+    
+    .message-received {
+      background-color: #e5e7eb;
+      color: var(--text-dark);
+      border-bottom-left-radius: 5px;
+    }
+    
+    .drop-zone {
+      border: 2px dashed #cbd5e1;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+    
+    .drop-zone:hover, .drop-zone.dragover {
+      border-color: var(--primary-color);
+      background-color: rgba(79, 70, 229, 0.05);
+    }
+    
+    @media (max-width: 768px) {
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: -280px;
+        height: 100vh;
+        width: 280px;
+        transition: left 0.3s ease;
+        z-index: 50;
+      }
+      
+      .sidebar.open {
+        left: 0;
+      }
+      
+      .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 40;
+        display: none;
+      }
+      
+      .overlay.active {
+        display: block;
+      }
+    }
+    
+    /* Loader animation */
+    .loader {
+      border: 3px solid #f3f3f3;
+      border-radius: 50%;
+      border-top: 3px solid var(--primary-color);
+      width: 24px;
+      height: 24px;
+      animation: spin 1s linear infinite;
+      display: none;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    /* Grades gauge */
+    .gauge-container {
+      position: relative;
+      width: 200px;
+      height: 100px;
+      margin: 0 auto;
+    }
+    
+    .gauge-background {
+      position: absolute;
+      width: 200px;
+      height: 100px;
+      border-top-left-radius: 100px;
+      border-top-right-radius: 100px;
+      background-color: #e5e7eb;
+      overflow: hidden;
+    }
+    
+    .gauge-fill {
+      position: absolute;
+      width: 200px;
+      height: 100px;
+      border-top-left-radius: 100px;
+      border-top-right-radius: 100px;
+      background-color: var(--primary-color);
+      transform-origin: center bottom;
+    }
+    
+    .gauge-center {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background-color: white;
+      border-radius: 50%;
+      bottom: 0;
+      left: 95px;
+      z-index: 2;
+    }
+    
+    .gauge-needle {
+      position: absolute;
+      width: 4px;
+      height: 90px;
+      background-color: var(--error-color);
+      bottom: 0;
+      left: 98px;
+      transform-origin: bottom center;
+      z-index: 1;
+      transition: transform 1s ease-out;
+    }
+    
+    .gauge-value {
+      position: absolute;
+      bottom: 10px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      color: var(--text-dark);
+    }
+    
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    .animate-fade-in {
+      animation: fadeIn 0.3s ease-in-out;
+    }
+    
+    /* Logout Modal */
+    .modal {
+      transition: opacity 0.3s ease;
+    }
+    
+    .modal-backdrop {
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+  </style>
+</head>
+
+<body class="bg-gray-50 theme-young">
+  <div class="min-h-screen flex flex-col">
+    <div class="overlay" id="overlay"></div>
+    
+    <!-- Mobile Header with hamburger menu -->
+    <header class="bg-white shadow-sm md:hidden sticky top-0 z-30">
+      <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+        <button id="menu-toggle" class="text-gray-500 hover:text-gray-700 focus:outline-none">
+          <i class="fas fa-bars text-xl"></i>
+        </button>
+        <div class="text-center">
+          <h1 class="text-xl font-bold text-indigo-600">Rural Education Connect</h1>
+        </div>
+        <div class="w-8">
+          <!-- Empty div for balance -->
+        </div>
+      </div>
+    </header>
+
+    <div class="flex flex-1">
+      <!-- Sidebar Navigation -->
+      <aside class="sidebar bg-white w-64 shadow-lg md:relative md:translate-x-0 flex-shrink-0">
+        <div class="p-4 flex flex-col h-full">
+          <div class="flex items-center justify-center mb-6">
+            
+            <h1 class="ml-2 text-xl font-bold text-indigo-600">Rural Education Connect</h1>
+          </div>
+          
+          <!-- Student Profile Summary -->
+          <div class="flex flex-col items-center mb-6 p-4 bg-indigo-50 rounded-lg">
+            <img src="https://images.unsplash.com/photo-1660798027105-5da8ad164e27?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjB8fHN0dWRlbnR8ZW58MHx8MHx8fDA%3D" alt="Student Avatar" class="w-20 h-20 rounded-full border-2 border-indigo-500 mb-2">
+            <h2 class="font-bold text-lg">Priya Sharma</h2>
+            <p class="text-sm text-gray-600">Class: 8th Grade</p>
+            <p class="text-sm text-gray-600">ID: STU-2025-1234</p>
+          </div>
+          
+          <!-- Navigation Links -->
+          <nav class="flex-1 space-y-2">
+            <div class="nav-link active flex items-center p-3 cursor-pointer" data-tab="profile">
+              <div class="icon w-6 text-center mr-3"><i class="fas fa-user"></i></div>
+              <span>Profile</span>
+            </div>
+            <div class="nav-link flex items-center p-3 cursor-pointer" data-tab="courses">
+              <div class="icon w-6 text-center mr-3"><i class="fas fa-book"></i></div>
+              <span>Courses</span>
+            </div>
+            <div class="nav-link flex items-center p-3 cursor-pointer" data-tab="assignments">
+              <div class="icon w-6 text-center mr-3"><i class="fas fa-tasks"></i></div>
+              <span>Assignments</span>
+            </div>
+            <div class="nav-link flex items-center p-3 cursor-pointer relative" data-tab="announcements">
+              <div class="icon w-6 text-center mr-3"><i class="fas fa-bullhorn"></i></div>
+              <span>Announcements</span>
+              <div class="badge" id="announcements-badge">3</div>
+            </div>
+            <div class="nav-link flex items-center p-3 cursor-pointer" data-tab="messages">
+              <div class="icon w-6 text-center mr-3"><i class="fas fa-comment"></i></div>
+              <span>Messages</span>
+            </div>
+            <div class="nav-link flex items-center p-3 cursor-pointer" data-tab="attendance">
+              <div class="icon w-6 text-center mr-3"><i class="fas fa-calendar-check"></i></div>
+              <span>Attendance</span>
+            </div>
+            <div class="nav-link flex items-center p-3 cursor-pointer" data-tab="grades">
+              <div class="icon w-6 text-center mr-3"><i class="fas fa-chart-line"></i></div>
+              <span>Grades</span>
+            </div>
+          </nav>
+          
+          <!-- Theme Toggle -->
+          <div class="border-t border-gray-200 pt-4 mt-4">
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-gray-600">Theme:</span>
+              <div class="flex items-center space-x-2">
+                <button id="theme-young" class="p-2 bg-purple-100 rounded-full active">
+                  <i class="fas fa-child text-purple-600"></i>
+                </button>
+                <button id="theme-older" class="p-2 bg-gray-100 rounded-full">
+                  <i class="fas fa-user-graduate text-blue-600"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Logout Button -->
+          <div class="border-t border-gray-200 pt-4 mt-4">
+            <button id="logout-btn" class="w-full flex items-center p-3 text-red-600 hover:bg-red-50 rounded-lg transition duration-200">
+              <div class="icon w-6 text-center mr-3"><i class="fas fa-sign-out-alt"></i></div>
+              <span>Logout</span>
+            </button>
+          </div>
+        </div>
+      </aside>
+      
+      <!-- Main Content -->
+      <main class="flex-1 p-4 md:p-6 overflow-auto">
+        <!-- Profile Tab -->
+        <div id="profile" class="tab-content active animate-fade-in">
+          <div class="bg-white shadow-sm rounded-lg p-6 mb-6">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">My Profile</h2>
+            <div class="grid md:grid-cols-2 gap-6">
+              <div>
+                <div class="mb-6">
+                  <h3 class="text-lg font-medium text-gray-700 mb-2">Personal Information</h3>
+                  <div class="bg-gray-50 p-4 rounded-md">
+                    <div class="flex flex-col space-y-2">
+                      <div class="flex justify-between">
+                        <span class="text-gray-600">Name:</span>
+                        <span class="font-medium">Priya Sharma</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span class="text-gray-600">Class:</span>
+                        <span class="font-medium">8th Grade</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span class="text-gray-600">Roll Number:</span>
+                        <span class="font-medium">2025-1234</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span class="text-gray-600">Date of Birth:</span>
+                        <span class="font-medium">12 March 2010</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span class="text-gray-600">Address:</span>
+                        <span class="font-medium">Village Sundarpur, District Barabanki</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div>
+                  <h3 class="text-lg font-medium text-gray-700 mb-2">Parent/Guardian Details</h3>
+                  <div class="bg-gray-50 p-4 rounded-md">
+                    <div class="flex flex-col space-y-2">
+                      <div class="flex justify-between">
+                        <span class="text-gray-600">Father's Name:</span>
+                        <span class="font-medium">Rakesh Sharma</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span class="text-gray-600">Mother's Name:</span>
+                        <span class="font-medium">Seema Sharma</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span class="text-gray-600">Contact Number:</span>
+                        <span class="font-medium">+91 9876543210</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="space-y-6">
+                <div>
+                  <h3 class="text-lg font-medium text-gray-700 mb-2">Academic Details</h3>
+                  <div class="bg-gray-50 p-4 rounded-md">
+                    <div class="flex flex-col space-y-2">
+                      <div class="flex justify-between">
+                        <span class="text-gray-600">School:</span>
+                        <span class="font-medium">Sundarpur Government School</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span class="text-gray-600">Academic Year:</span>
+                        <span class="font-medium">2025-2026</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span class="text-gray-600">Class Teacher:</span>
+                        <span class="font-medium">Mrs. Anjali Gupta</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div>
+                  <h3 class="text-lg font-medium text-gray-700 mb-2">Skills & Interests</h3>
+                  <div class="bg-gray-50 p-4 rounded-md">
+                    <div class="flex flex-wrap gap-2">
+                      <span class="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm">Mathematics</span>
+                      <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">Science</span>
+                      <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">Drawing</span>
+                      <span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm">Cricket</span>
+                      <span class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm">Chess</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div>
+                  <h3 class="text-lg font-medium text-gray-700 mb-2">Learning Progress</h3>
+                  <div class="bg-gray-50 p-4 rounded-md">
+                    <div class="mb-3">
+                      <div class="flex justify-between mb-1">
+                        <span class="text-sm text-gray-600">Overall Progress</span>
+                        <span class="text-sm font-medium text-indigo-600">78%</span>
+                      </div>
+                      <div class="progress-bar">
+                        <div class="progress-bar-fill" style="width: 78%"></div>
+                      </div>
+                    </div>
+                    <div>
+                      <p class="text-sm text-gray-600 mb-2">Achievement Badges:</p>
+                      <div class="flex space-x-2">
+                        <div class="flex flex-col items-center">
+                          <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center">
+                            <i class="fas fa-star text-yellow-500"></i>
+                          </div>
+                          <span class="text-xs mt-1">Math Whiz</span>
+                        </div>
+                        <div class="flex flex-col items-center">
+                          <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+                            <i class="fas fa-flask text-green-500"></i>
+                          </div>
+                          <span class="text-xs mt-1">Science Pro</span>
+                        </div>
+                        <div class="flex flex-col items-center">
+                          <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                            <i class="fas fa-book-reader text-blue-500"></i>
+                          </div>
+                          <span class="text-xs mt-1">Bookworm</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Courses Tab -->
+        <div id="courses" class="tab-content animate-fade-in">
+          <div class="bg-white shadow-sm rounded-lg p-6 mb-6">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">My Courses</h2>
+            <div class="grid md:grid-cols-2 gap-6" id="courses-container">
+              <!-- Courses will be dynamically loaded here -->
+            </div>
+          </div>
+        </div>
+        
+        <!-- Assignments Tab -->
+        <div id="assignments" class="tab-content animate-fade-in">
+          <div class="bg-white shadow-sm rounded-lg p-6 mb-6">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">My Assignments</h2>
+            
+            <div class="mb-8">
+              <h3 class="text-lg font-medium text-gray-700 mb-3">Upcoming Assignments</h3>
+              <div class="space-y-4" id="assignments-list">
+                <!-- Assignments will be dynamically loaded here -->
+              </div>
+            </div>
+            
+            <div>
+              <h3 class="text-lg font-medium text-gray-700 mb-3">Submit Assignment</h3>
+              <div class="bg-white border border-dashed border-gray-300 rounded-lg p-6">
+                <div class="mb-4">
+                  <label for="assignment-select" class="block text-sm font-medium text-gray-700 mb-1">Select Assignment</label>
+                  <select id="assignment-select" class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    <option value="">-- Select an assignment --</option>
+                    <option value="math">Mathematics - Algebra Practice</option>
+                    <option value="science">Science - Plant Cell Diagram</option>
+                    <option value="hindi">Hindi - Essay Writing</option>
+                  </select>
+                </div>
+                
+                <div class="mb-6">
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Upload File</label>
+                  <div id="drop-zone" class="drop-zone p-8 text-center cursor-pointer">
+                    <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
+                    <p class="text-gray-600 mb-1">Drag and drop files here or click to upload</p>
+                    <p class="text-xs text-gray-500">(Maximum file size: 25MB)</p>
+                    <input type="file" id="file-upload" class="hidden">
+                  </div>
+                </div>
+                
+                <div class="mb-4">
+                  <label for="assignment-notes" class="block text-sm font-medium text-gray-700 mb-1">Notes for Teacher (Optional)</label>
+                  <textarea id="assignment-notes" rows="3" class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Add any notes or questions for your teacher..."></textarea>
+                </div>
+                
+                <div class="flex items-center justify-end">
+                  <div class="loader mr-3" id="submission-loader"></div>
+                  <button type="button" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md mr-2 hover:bg-gray-300 transition duration-200">Cancel</button>
+                  <button type="button" id="submit-assignment-btn" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition duration-200">Submit Assignment</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Announcements Tab -->
+        <div id="announcements" class="tab-content animate-fade-in">
+          <div class="bg-white shadow-sm rounded-lg p-6 mb-6">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Announcements</h2>
+            
+            <div class="space-y-4" id="announcements-list">
+              <!-- Announcements will be dynamically loaded here -->
+            </div>
+          </div>
+        </div>
+        
+        <!-- Messages Tab -->
+        <div id="messages" class="tab-content animate-fade-in">
+          <div class="bg-white shadow-sm rounded-lg p-6 mb-6">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Messages</h2>
+            
+            <div class="flex h-[500px] border border-gray-200 rounded-lg overflow-hidden">
+              <div class="w-1/3 border-r border-gray-200 bg-gray-50">
+                <div class="p-3 border-b border-gray-200">
+                  <div class="relative">
+                    <input type="text" placeholder="Search messages..." class="w-full p-2 pl-8 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm">
+                    <i class="fas fa-search text-gray-400 absolute left-3 top-3 text-sm"></i>
+                  </div>
+                </div>
+                
+                <div class="overflow-y-auto h-[calc(100%-51px)]" id="messages-list">
+                  <!-- Messages will be dynamically loaded here -->
+                </div>
+              </div>
+              
+              <div class="w-2/3 flex flex-col">
+                <div class="p-3 border-b border-gray-200 bg-white">
+                  <div class="flex items-center">
+                    <div class="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center text-white mr-3">
+                      <span id="current-teacher-initials">RV</span>
+                    </div>
+                    <div>
+                      <h4 class="font-medium text-gray-800" id="current-teacher-name">Mr. Rajesh Verma</h4>
+                      <p class="text-xs text-green-600" id="current-teacher-status">Online now</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="flex-1 overflow-y-auto p-4" id="message-container">
+                  <div class="flex flex-col space-y-4">
+                    <!-- Messages will be dynamically loaded here -->
+                  </div>
+                </div>
+                
+                <div class="p-3 border-t border-gray-200 bg-white">
+                  <div class="flex items-center">
+                    <input type="text" id="message-input" placeholder="Type a message..." class="flex-1 p-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    <button type="button" id="send-message-btn" class="px-4 py-2 bg-indigo-600 text-white rounded-r-md hover:bg-indigo-700 transition duration-200">
+                      <i class="fas fa-paper-plane"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Attendance Tab -->
+        <div id="attendance" class="tab-content animate-fade-in">
+          <div class="bg-white shadow-sm rounded-lg p-6 mb-6">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">My Attendance</h2>
+            
+            <div class="mb-6">
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-medium text-gray-700">July 2025</h3>
+                <div class="flex space-x-2">
+                  <button class="p-2 rounded-full hover:bg-gray-100">
+                    <i class="fas fa-chevron-left text-gray-600"></i>
+                  </button>
+                  <button class="p-2 rounded-full hover:bg-gray-100">
+                    <i class="fas fa-chevron-right text-gray-600"></i>
+                  </button>
+                </div>
+              </div>
+              
+              <div class="grid grid-cols-7 gap-2 text-center mb-2">
+                <div class="text-sm font-medium text-gray-600">Sun</div>
+                <div class="text-sm font-medium text-gray-600">Mon</div>
+                <div class="text-sm font-medium text-gray-600">Tue</div>
+                <div class="text-sm font-medium text-gray-600">Wed</div>
+                <div class="text-sm font-medium text-gray-600">Thu</div>
+                <div class="text-sm font-medium text-gray-600">Fri</div>
+                <div class="text-sm font-medium text-gray-600">Sat</div>
+              </div>
+              
+              <div class="grid grid-cols-7 gap-2 text-center">
+                <div class="calendar-day text-gray-400">28</div>
+                <div class="calendar-day text-gray-400">29</div>
+                <div class="calendar-day text-gray-400">30</div>
+                <div class="calendar-day">1</div>
+                <div class="calendar-day present">2</div>
+                <div class="calendar-day present">3</div>
+                <div class="calendar-day">4</div>
+                <div class="calendar-day">5</div>
+                <div class="calendar-day present">6</div>
+                <div class="calendar-day present">7</div>
+                <div class="calendar-day present">8</div>
+                <div class="calendar-day present">9</div>
+                <div class="calendar-day present">10</div>
+                <div class="calendar-day">11</div>
+                <div class="calendar-day">12</div>
+                <div class="calendar-day present">13</div>
+                <div class="calendar-day present">14</div>
+                <div class="calendar-day present">15</div>
+                <div class="calendar-day absent">16</div>
+                <div class="calendar-day present">17</div>
+                <div class="calendar-day">18</div>
+                <div class="calendar-day">19</div>
+                <div class="calendar-day present">20</div>
+                <div class="calendar-day present">21</div>
+                <div class="calendar-day present">22</div>
+                <div class="calendar-day present">23</div>
+                <div class="calendar-day present">24</div>
+                <div class="calendar-day">25</div>
+                <div class="calendar-day">26</div>
+                <div class="calendar-day present">27</div>
+                <div class="calendar-day present">28</div>
+                <div class="calendar-day present">29</div>
+                <div class="calendar-day present">30</div>
+                <div class="calendar-day present">31</div>
+                <div class="calendar-day text-gray-400">1</div>
+              </div>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-6">
+              <div>
+                <h3 class="text-lg font-medium text-gray-700 mb-3">Attendance Summary</h3>
+                <div class="bg-gray-50 p-4 rounded-lg">
+                  <div class="grid grid-cols-3 gap-4 text-center">
+                    <div>
+                      <div class="text-3xl font-bold text-indigo-600" id="attendance-present">95%</div>
+                      <div class="text-sm text-gray-600">Present</div>
+                    </div>
+                    <div>
+                      <div class="text-3xl font-bold text-red-500" id="attendance-absent">1</div>
+                      <div class="text-sm text-gray-600">Absent</div>
+                    </div>
+                    <div>
+                      <div class="text-3xl font-bold text-yellow-500" id="attendance-late">0</div>
+                      <div class="text-sm text-gray-600">Late</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div>
+                <h3 class="text-lg font-medium text-gray-700 mb-3">Attendance History</h3>
+                <div class="bg-gray-50 p-4 rounded-lg h-[150px]">
+                  <canvas id="attendance-chart"></canvas>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mt-6">
+              <h3 class="text-lg font-medium text-gray-700 mb-3">Recent Absences</h3>
+              <div class="bg-gray-50 p-4 rounded-lg" id="absences-list">
+                <!-- Absences will be dynamically loaded here -->
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Grades Tab -->
+        <div id="grades" class="tab-content animate-fade-in">
+          <div class="bg-white shadow-sm rounded-lg p-6 mb-6">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">My Grades</h2>
+            
+            <div class="mb-8">
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-medium text-gray-700">Overall Performance</h3>
+                <select class="p-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                  <option>Current Term</option>
+                  <option>Term 1</option>
+                  <option>Previous Year</option>
+                </select>
+              </div>
+              
+              <div class="grid md:grid-cols-2 gap-6">
+                <div class="bg-gray-50 p-4 rounded-lg">
+                  <div class="text-center mb-3">
+                    <h4 class="text-lg font-medium text-gray-700">Grade Point Average</h4>
+                    <div class="text-4xl font-bold text-indigo-600 mt-2" id="gpa-value">4.2</div>
+                    <p class="text-sm text-gray-600 mt-1">out of 5.0</p>
+                  </div>
+                  
+                  <div class="gauge-container mt-3">
+                    <div class="gauge-background"></div>
+                    <div class="gauge-fill" id="grade-gauge" style="transform: rotate(155deg);"></div>
+                    <div class="gauge-center"></div>
+                    <div class="gauge-needle" id="grade-needle" style="transform: rotate(155deg);"></div>
+                    <div class="gauge-value" id="grade-percentage">84%</div>
+                  </div>
+                </div>
+                
+                <div class="bg-gray-50 p-4 rounded-lg">
+                  <h4 class="text-lg font-medium text-gray-700 mb-3">Subject-wise Performance</h4>
+                  <div class="space-y-3" id="subject-grades">
+                    <!-- Subject grades will be dynamically loaded here -->
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div>
+              <h3 class="text-lg font-medium text-gray-700 mb-3">Recent Grades</h3>
+              <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                  <thead class="bg-gray-50">
+                    <tr>
+                      <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subject</th>
+                      <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assignment</th>
+                      <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                      <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Grade</th>
+                      <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Comments</th>
+                    </tr>
+                  </thead>
+                  <tbody class="bg-white divide-y divide-gray-200" id="recent-grades">
+                    <!-- Recent grades will be dynamically loaded here -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Logout Confirmation Modal -->
+  <div id="logout-modal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
+      <div class="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 rounded-full mb-4">
+        <i class="fas fa-sign-out-alt text-red-600 text-xl"></i>
+      </div>
+      <h3 class="text-lg font-medium text-gray-900 text-center mb-2">Confirm Logout</h3>
+      <p class="text-sm text-gray-500 text-center mb-6">Are you sure you want to logout from your account?</p>
+      <div class="flex justify-center space-x-3">
+        <button id="cancel-logout" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500">
+          Cancel
+        </button>
+        <button id="confirm-logout" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500">
+          Logout
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script id="app-script">
+    // Mock API data
+    const mockData = {
+      profile: {
+        name: "Priya Sharma",
+        class: "8th Grade",
+        rollNumber: "2025-1234",
+        dateOfBirth: "12 March 2010",
+        address: "Village Sundarpur, District Barabanki",
+        fatherName: "Rakesh Sharma",
+        motherName: "Seema Sharma",
+        contactNumber: "+91 9876543210",
+        school: "Sundarpur Government School",
+        academicYear: "2025-2026",
+        classTeacher: "Mrs. Anjali Gupta",
+        skills: ["Mathematics", "Science", "Drawing", "Cricket", "Chess"],
+        progress: 78,
+        badges: [
+          { id: 1, name: "Math Whiz", icon: "star", color: "yellow" },
+          { id: 2, name: "Science Pro", icon: "flask", color: "green" },
+          { id: 3, name: "Bookworm", icon: "book-reader", color: "blue" }
+        ]
+      },
+      courses: [
+        {
+          id: 1,
+          name: "Mathematics",
+          teacher: "Mr. Rajesh Verma",
+          progress: 85,
+          nextClass: "Monday, 10:00 AM",
+          icon: "calculator",
+          color: "indigo"
+        },
+        {
+          id: 2,
+          name: "Science",
+          teacher: "Mrs. Preeti Singh",
+          progress: 72,
+          nextClass: "Tuesday, 11:30 AM",
+          icon: "flask",
+          color: "green"
+        },
+        {
+          id: 3,
+          name: "Hindi",
+          teacher: "Mr. Avinash Tiwari",
+          progress: 90,
+          nextClass: "Wednesday, 9:15 AM",
+          icon: "language",
+          color: "blue"
+        },
+        {
+          id: 4,
+          name: "English",
+          teacher: "Mrs. Shalini Kumar",
+          progress: 65,
+          nextClass: "Thursday, 1:00 PM",
+          icon: "book",
+          color: "red"
+        },
+        {
+          id: 5,
+          name: "Social Studies",
+          teacher: "Mr. Anand Mishra",
+          progress: 78,
+          nextClass: "Friday, 10:45 AM",
+          icon: "globe-asia",
+          color: "yellow"
+        },
+        {
+          id: 6,
+          name: "Art & Craft",
+          teacher: "Ms. Meena Sharma",
+          progress: 82,
+          nextClass: "Saturday, 11:00 AM",
+          icon: "paint-brush",
+          color: "purple"
+        }
+      ],
+      assignments: [
+        {
+          id: "math",
+          title: "Mathematics - Algebra Practice",
+          description: "Solve the equations on page 45-46 of your textbook",
+          dueDate: "Tomorrow, 3:00 PM",
+          teacher: "Mr. Rajesh Verma",
+          submitted: false
+        },
+        {
+          id: "science",
+          title: "Science - Plant Cell Diagram",
+          description: "Draw and label a plant cell with all its organelles",
+          dueDate: "3 days, 11:59 PM",
+          teacher: "Mrs. Preeti Singh",
+          submitted: false
+        },
+        {
+          id: "hindi",
+          title: "Hindi - Essay Writing",
+          description: "Write an essay on \"My Village\" in 500 words",
+          dueDate: "5 days, 9:00 AM",
+          teacher: "Mr. Avinash Tiwari",
+          submitted: false
+        }
+      ],
+      announcements: [
+        {
+          id: "ann-1",
+          title: "School Annual Function - Preparations Begin!",
+          content: "Our annual function is scheduled for the 15th of next month. All students are requested to register for cultural performances by the end of this week.",
+          postedBy: "Principal",
+          date: "Today, 9:30 AM",
+          isNew: true
+        },
+        {
+          id: "ann-2",
+          title: "Free Health Checkup Camp",
+          content: "A free health checkup camp will be organized in our school on Saturday, 10th July. All students should come with their parents.",
+          postedBy: "School Nurse",
+          date: "Yesterday, 3:15 PM",
+          isNew: true
+        },
+        {
+          id: "ann-3",
+          title: "Science Exhibition - Registration Open",
+          content: "The inter-school science exhibition will be held next month. Students interested in participating should register with their science teacher by Friday.",
+          postedBy: "Mrs. Preeti Singh",
+          date: "3 days ago",
+          isNew: true
+        },
+        {
+          id: "ann-4",
+          title: "Internet Facility Update",
+          content: "We are pleased to inform you that the school now has improved internet connectivity for educational purposes. Students can access the computer lab during lunch breaks.",
+          postedBy: "IT Department",
+          date: "1 week ago",
+          isNew: false
+        },
+        {
+          id: "ann-5",
+          title: "New Library Books Arrived",
+          content: "Our school library has received a new collection of books on various subjects. Students are encouraged to visit the library and explore the new additions.",
+          postedBy: "Librarian",
+          date: "2 weeks ago",
+          isNew: false
+        }
+      ],
+      messages: [
+        {
+          id: 1,
+          teacherId: "RV",
+          teacherName: "Mr. Rajesh Verma",
+          color: "green",
+          lastMessage: "About your math assignment...",
+          time: "10:30 AM",
+          online: true,
+          conversation: [
+            {
+              sender: "teacher",
+              message: "Hello Priya, I wanted to check if you have any questions about the math assignment I gave yesterday?",
+              time: "10:15 AM"
+            },
+            {
+              sender: "student",
+              message: "Hello sir, yes I was having some trouble with question number 5. Could you please explain it again?",
+              time: "10:20 AM"
+            },
+            {
+              sender: "teacher",
+              message: "Of course! For question 5, you need to first find the value of x using the quadratic formula. Then substitute that value back into the original equation to solve for y.",
+              time: "10:25 AM"
+            },
+            {
+              sender: "teacher",
+              message: "Would you like me to send you a step-by-step solution?",
+              time: "10:26 AM"
+            },
+            {
+              sender: "student",
+              message: "Yes, that would be very helpful! Thank you so much sir.",
+              time: "10:30 AM"
+            }
+          ]
+        },
+        {
+          id: 2,
+          teacherId: "PS",
+          teacherName: "Mrs. Preeti Singh",
+          color: "purple",
+          lastMessage: "Your science project looks great!",
+          time: "Yesterday",
+          online: false,
+          conversation: [
+            {
+              sender: "teacher",
+              message: "Your science project looks great!",
+              time: "Yesterday"
+            }
+          ]
+        },
+        {
+          id: 3,
+          teacherId: "AT",
+          teacherName: "Mr. Avinash Tiwari",
+          color: "yellow",
+          lastMessage: "Don't forget to submit your Hindi essay",
+          time: "Monday",
+          online: false,
+          conversation: [
+            {
+              sender: "teacher",
+              message: "Don't forget to submit your Hindi essay",
+              time: "Monday"
+            }
+          ]
+        },
+        {
+          id: 4,
+          teacherId: "SK",
+          teacherName: "Mrs. Shalini Kumar",
+          color: "red",
+          lastMessage: "Your English presentation is scheduled for...",
+          time: "Last week",
+          online: false,
+          conversation: [
+            {
+              sender: "teacher",
+              message: "Your English presentation is scheduled for next week",
+              time: "Last week"
+            }
+          ]
+        }
+      ],
+      attendance: {
+        summary: {
+          present: 95,
+          absent: 1,
+          late: 0
+        },
+        history: [
+          { month: 'Feb', percentage: 92 },
+          { month: 'Mar', percentage: 95 },
+          { month: 'Apr', percentage: 88 },
+          { month: 'May', percentage: 100 },
+          { month: 'Jun', percentage: 98 },
+          { month: 'Jul', percentage: 95 }
+        ],
+        absences: [
+          {
+            date: "16 July, 2025",
+            classes: "All classes",
+            reason: "Fever - Parent note provided",
+            type: "Medical Leave"
+          }
+        ]
+      },
+      grades: {
+        gpa: 4.2,
+        maxGpa: 5.0,
+        percentage: 84,
+        subjects: [
+          { name: "Mathematics", percentage: 92 },
+          { name: "Science", percentage: 87 },
+          { name: "Hindi", percentage: 95 },
+          { name: "English", percentage: 78 },
+          { name: "Social Studies", percentage: 83 }
+        ],
+        recent: [
+          {
+            subject: "Mathematics",
+            assignment: "Quadratic Equations Quiz",
+            date: "July 10, 2025",
+            grade: "45/50",
+            comments: "Excellent work on complex problems"
+          },
+          {
+            subject: "Science",
+            assignment: "Cell Structure Model",
+            date: "July 5, 2025",
+            grade: "A+",
+            comments: "Creative approach and accurate details"
+          },
+          {
+            subject: "Hindi",
+            assignment: "Poetry Recitation",
+            date: "June 28, 2025",
+            grade: "19/20",
+            comments: "Excellent expression and pronunciation"
+          },
+          {
+            subject: "English",
+            assignment: "Essay Writing",
+            date: "June 25, 2025",
+            grade: "B+",
+            comments: "Good ideas but work on grammar"
+          },
+          {
+            subject: "Social Studies",
+            assignment: "History Project",
+            date: "June 20, 2025",
+            grade: "A",
+            comments: "Well-researched and organized"
+          }
+        ]
+      }
+    };
+
+    // Mock API functions
+    const mockAPI = {
+      getProfile: () => new Promise(resolve => setTimeout(() => resolve(mockData.profile), 300)),
+      getCourses: () => new Promise(resolve => setTimeout(() => resolve(mockData.courses), 300)),
+      getAssignments: () => new Promise(resolve => setTimeout(() => resolve(mockData.assignments), 300)),
+      submitAssignment: (assignmentId, file, notes) => new Promise(resolve => {
+        setTimeout(() => {
+          // Update assignment status
+          const assignment = mockData.assignments.find(a => a.id === assignmentId);
+          if (assignment) {
+            assignment.submitted = true;
+          }
+          resolve({ success: true, message: "Assignment submitted successfully" });
+        }, 1000);
+      }),
+      getAnnouncements: () => new Promise(resolve => setTimeout(() => resolve(mockData.announcements), 300)),
+      getMessages: () => new Promise(resolve => setTimeout(() => resolve(mockData.messages), 300)),
+      getMessage: (teacherId) => new Promise(resolve => {
+        setTimeout(() => {
+          const message = mockData.messages.find(m => m.teacherId === teacherId);
+          resolve(message);
+        }, 300);
+      }),
+      sendMessage: (teacherId, message) => new Promise(resolve => {
+        setTimeout(() => {
+          const conversation = mockData.messages.find(m => m.teacherId === teacherId);
+          if (conversation) {
+            conversation.conversation.push({
+              sender: "student",
+              message,
+              time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            });
+            conversation.lastMessage = message;
+            conversation.time = "Just now";
+          }
+          resolve({ success: true, message: "Message sent successfully" });
+        }, 300);
+      }),
+      getAttendance: () => new Promise(resolve => setTimeout(() => resolve(mockData.attendance), 300)),
+      getGrades: () => new Promise(resolve => setTimeout(() => resolve(mockData.grades), 300))
+    };
+
+    // Initialize app
+    document.addEventListener('DOMContentLoaded', function() {
+      // Tab navigation
+      const navLinks = document.querySelectorAll('.nav-link');
+      const tabContents = document.querySelectorAll('.tab-content');
+      
+      navLinks.forEach(link => {
+        link.addEventListener('click', function() {
+          // Remove active class from all tabs and links
+          navLinks.forEach(l => l.classList.remove('active'));
+          tabContents.forEach(t => t.classList.remove('active'));
+          
+          // Add active class to current link
+          this.classList.add('active');
+          
+          // Show corresponding tab content
+          const tabId = this.getAttribute('data-tab');
+          document.getElementById(tabId).classList.add('active');
+          
+          // Load data for the active tab
+          loadTabData(tabId);
+          
+          // Close mobile menu if open
+          if (window.innerWidth < 768) {
+            document.querySelector('.sidebar').classList.remove('open');
+            document.getElementById('overlay').classList.remove('active');
+          }
+        });
+      });
+      
+      // Mobile menu toggle
+      const menuToggle = document.getElementById('menu-toggle');
+      const sidebar = document.querySelector('.sidebar');
+      const overlay = document.getElementById('overlay');
+      
+      menuToggle.addEventListener('click', function() {
+        sidebar.classList.toggle('open');
+        overlay.classList.toggle('active');
+      });
+      
+      overlay.addEventListener('click', function() {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('active');
+      });
+      
+      // Theme switching
+      const themeYoungBtn = document.getElementById('theme-young');
+      const themeOlderBtn = document.getElementById('theme-older');
+      
+      themeYoungBtn.addEventListener('click', function() {
+        document.body.classList.remove('theme-older');
+        document.body.classList.add('theme-young');
+        themeYoungBtn.classList.add('active');
+        themeOlderBtn.classList.remove('active');
+      });
+      
+      themeOlderBtn.addEventListener('click', function() {
+        document.body.classList.remove('theme-young');
+        document.body.classList.add('theme-older');
+        themeOlderBtn.classList.add('active');
+        themeYoungBtn.classList.remove('active');
+      });
+      
+      // Logout functionality
+      const logoutBtn = document.getElementById('logout-btn');
+      const logoutModal = document.getElementById('logout-modal');
+      const cancelLogout = document.getElementById('cancel-logout');
+      const confirmLogout = document.getElementById('confirm-logout');
+      
+      logoutBtn.addEventListener('click', function() {
+        logoutModal.classList.remove('hidden');
+      });
+      
+      cancelLogout.addEventListener('click', function() {
+        logoutModal.classList.add('hidden');
+      });
+      
+      confirmLogout.addEventListener('click', function() {
+        // Clear any session data or tokens
+        localStorage.removeItem('userToken');
+        sessionStorage.removeItem('userData');
+        
+        // Redirect to landing page
+        window.location.href = 'landing.html';
+      });
+      
+      // Load data for active tab on page load
+      const activeTab = document.querySelector('.nav-link.active').getAttribute('data-tab');
+      loadTabData(activeTab);
+      
+      // Setup file upload for assignments
+      setupFileUpload();
+      
+      // Setup message sending
+      setupMessageSending();
+    });
+    
+    // Function to load data for a specific tab
+    async function loadTabData(tabId) {
+      try {
+        switch(tabId) {
+          case 'profile':
+            await loadProfileData();
+            break;
+          case 'courses':
+            await loadCoursesData();
+            break;
+          case 'assignments':
+            await loadAssignmentsData();
+            break;
+          case 'announcements':
+            await loadAnnouncementsData();
+            break;
+          case 'messages':
+            await loadMessagesData();
+            break;
+          case 'attendance':
+            await loadAttendanceData();
+            break;
+          case 'grades':
+            await loadGradesData();
+            break;
+        }
+      } catch (error) {
+        console.error(`Error loading ${tabId} data:`, error);
+      }
+    }
+    
+    // Load profile data
+    async function loadProfileData() {
+      const profile = await mockAPI.getProfile();
+      console.log('Profile data loaded:', profile);
+    }
+    
+    // Load courses data
+    async function loadCoursesData() {
+      const courses = await mockAPI.getCourses();
+      const coursesContainer = document.getElementById('courses-container');
+      
+      coursesContainer.innerHTML = courses.map(course => `
+        <div class="bg-gray-50 p-4 rounded-lg border border-gray-100">
+          <div class="flex items-center mb-3">
+            <div class="w-12 h-12 rounded-full bg-${course.color}-100 flex items-center justify-center mr-4">
+              <i class="fas fa-${course.icon} text-${course.color}-500 text-lg"></i>
+            </div>
+            <div>
+              <h3 class="font-medium text-lg">${course.name}</h3>
+              <p class="text-sm text-gray-600">Teacher: ${course.teacher}</p>
+            </div>
+          </div>
+          <div class="mb-2">
+            <div class="flex justify-between mb-1">
+              <span class="text-sm text-gray-600">Progress</span>
+              <span class="text-sm font-medium text-indigo-600">${course.progress}%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-bar-fill" style="width: ${course.progress}%"></div>
+            </div>
+          </div>
+          <div class="flex justify-between text-sm mt-3">
+            <span class="text-gray-600">Next class: ${course.nextClass}</span>
+            <a href="javascript:void(0)" class="text-indigo-600 font-medium">View details</a>
+          </div>
+        </div>
+      `).join('');
+    }
+    
+    // Load assignments data
+    async function loadAssignmentsData() {
+      const assignments = await mockAPI.getAssignments();
+      const assignmentsList = document.getElementById('assignments-list');
+      
+      assignmentsList.innerHTML = assignments.map(assignment => `
+        <div class="p-4 border border-gray-200 rounded-lg bg-gray-50">
+          <div class="flex justify-between items-start">
+            <div>
+              <h4 class="font-medium text-indigo-600">${assignment.title}</h4>
+              <p class="text-sm text-gray-600 mt-1">${assignment.description}</p>
+              <div class="flex items-center mt-2">
+                <span class="text-xs bg-red-100 text-red-800 px-2 py-1 rounded-full mr-3">Due: ${assignment.dueDate}</span>
+                <span class="text-xs text-gray-500">Assigned by: ${assignment.teacher}</span>
+              </div>
+            </div>
+            <a href="javascript:void(0)" class="px-3 py-1 bg-indigo-600 text-white rounded-md text-sm hover:bg-indigo-700 transition duration-200" ${assignment.submitted ? 'disabled' : ''}>
+              ${assignment.submitted ? 'Submitted' : 'Submit'}
+            </a>
+          </div>
+        </div>
+      `).join('');
+    }
+    
+    // Load announcements data
+    async function loadAnnouncementsData() {
+      const announcements = await mockAPI.getAnnouncements();
+      const announcementsList = document.getElementById('announcements-list');
+      
+      announcementsList.innerHTML = announcements.map(announcement => {
+        let colorClass = 'indigo';
+        if (announcement.id === 'ann-2') colorClass = 'green';
+        if (announcement.id === 'ann-3') colorClass = 'yellow';
+        if (announcement.id === 'ann-4') colorClass = 'blue';
+        if (announcement.id === 'ann-5') colorClass = 'purple';
+        
+        return `
+          <div class="p-4 border-l-4 border-${colorClass}-500 bg-${colorClass}-50 rounded-r-lg" data-announcement-id="${announcement.id}">
+            <div class="flex justify-between items-start">
+              <h3 class="font-medium text-${colorClass}-800">${announcement.title}</h3>
+              ${announcement.isNew ? '<span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">New</span>' : ''}
+            </div>
+            <p class="text-gray-600 my-2">${announcement.content}</p>
+            <div class="flex justify-between items-center text-sm">
+              <span class="text-gray-500">Posted by: ${announcement.postedBy}</span>
+              <span class="text-gray-500">${announcement.date}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+      
+      // Setup announcement read status
+      setupAnnouncementReadStatus();
+    }
+    
+    // Load messages data
+    async function loadMessagesData() {
+      const messages = await mockAPI.getMessages();
+      const messagesList = document.getElementById('messages-list');
+      
+      messagesList.innerHTML = messages.map(message => `
+        <div class="p-3 border-b border-gray-200 ${message.online ? 'bg-indigo-50' : ''} cursor-pointer hover:bg-indigo-100 transition duration-200" data-teacher-id="${message.teacherId}">
+          <div class="flex items-center">
+            <div class="w-10 h-10 rounded-full bg-${message.color}-500 flex items-center justify-center text-white mr-3">
+              <span>${message.teacherId}</span>
+            </div>
+            <div class="flex-1">
+              <h4 class="font-medium text-gray-800">${message.teacherName}</h4>
+              <p class="text-sm text-gray-600 truncate">${message.lastMessage}</p>
+            </div>
+            <div class="text-xs text-gray-500">${message.time}</div>
+          </div>
+        </div>
+      `).join('');
+      
+      // Setup message conversation loading
+      setupMessageConversation();
+      
+      // Load first conversation by default
+      if (messages.length > 0) {
+        loadConversation(messages[0].teacherId);
+      }
+    }
+    
+    // Load attendance data
+    async function loadAttendanceData() {
+      const attendance = await mockAPI.getAttendance();
+      
+      // Update attendance summary
+      document.getElementById('attendance-present').textContent = `${attendance.summary.present}%`;
+      document.getElementById('attendance-absent').textContent = attendance.summary.absent;
+      document.getElementById('attendance-late').textContent = attendance.summary.late;
+      
+      // Update absences list
+      const absencesList = document.getElementById('absences-list');
+      if (attendance.absences.length > 0) {
+        absencesList.innerHTML = `
+          <div class="border-b border-gray-200 pb-3 mb-3">
+            <div class="flex justify-between items-start">
+              <div>
+                <h4 class="font-medium text-gray-800">${attendance.absences[0].date}</h4>
+                <p class="text-sm text-gray-600">${attendance.absences[0].classes}</p>
+              </div>
+              <span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-xs">${attendance.absences[0].type}</span>
+            </div>
+            <p class="text-sm text-gray-600 mt-2">Reason: ${attendance.absences[0].reason}</p>
+          </div>
+          <div class="text-center text-sm text-gray-600">
+            No other absences in the last 90 days
+          </div>
+        `;
+      } else {
+        absencesList.innerHTML = '<div class="text-center text-sm text-gray-600">No absences in the last 90 days</div>';
+      }
+      
+      // Initialize attendance chart
+      initializeAttendanceChart(attendance.history);
+    }
+    
+    // Load grades data
+    async function loadGradesData() {
+      const grades = await mockAPI.getGrades();
+      
+      // Update GPA and percentage
+      document.getElementById('gpa-value').textContent = grades.gpa;
+      document.getElementById('grade-percentage').textContent = `${grades.percentage}%`;
+      
+      // Update grade gauge
+      updateGradeGauge(grades.percentage);
+      
+      // Update subject grades
+      const subjectGrades = document.getElementById('subject-grades');
+      subjectGrades.innerHTML = grades.subjects.map(subject => `
+        <div>
+          <div class="flex justify-between mb-1">
+            <span class="text-sm text-gray-600">${subject.name}</span>
+            <span class="text-sm font-medium text-indigo-600">${subject.percentage}%</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-bar-fill" style="width: ${subject.percentage}%"></div>
+          </div>
+        </div>
+      `).join('');
+      
+      // Update recent grades table
+      const recentGrades = document.getElementById('recent-grades');
+      recentGrades.innerHTML = grades.recent.map(grade => `
+        <tr>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="text-sm font-medium text-gray-900">${grade.subject}</div>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="text-sm text-gray-500">${grade.assignment}</div>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="text-sm text-gray-500">${grade.date}</div>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="text-sm font-medium text-green-600">${grade.grade}</div>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="text-sm text-gray-500">${grade.comments}</div>
+          </td>
+        </tr>
+      `).join('');
+    }
+    
+    // Setup file upload for assignments
+    function setupFileUpload() {
+      const dropZone = document.getElementById('drop-zone');
+      const fileUpload = document.getElementById('file-upload');
+      const submitButton = document.getElementById('submit-assignment-btn');
+      const loader = document.getElementById('submission-loader');
+      
+      if (dropZone && fileUpload) {
+        dropZone.addEventListener('click', function() {
+          fileUpload.click();
+        });
+        
+        dropZone.addEventListener('dragover', function(e) {
+          e.preventDefault();
+          this.classList.add('dragover');
+        });
+        
+        dropZone.addEventListener('dragleave', function() {
+          this.classList.remove('dragover');
+        });
+        
+        dropZone.addEventListener('drop', function(e) {
+          e.preventDefault();
+          this.classList.remove('dragover');
+          
+          if (e.dataTransfer.files.length) {
+            fileUpload.files = e.dataTransfer.files;
+            // Show file name or preview
+            const fileName = e.dataTransfer.files[0].name;
+            this.innerHTML = `<p class="text-indigo-600"><i class="fas fa-file-alt mr-2"></i>${fileName}</p><p class="text-xs text-gray-500 mt-2">File selected. Click to change.</p>`;
+          }
+        });
+        
+        fileUpload.addEventListener('change', function() {
+          if (this.files.length) {
+            const fileName = this.files[0].name;
+            dropZone.innerHTML = `<p class="text-indigo-600"><i class="fas fa-file-alt mr-2"></i>${fileName}</p><p class="text-xs text-gray-500 mt-2">File selected. Click to change.</p>`;
+          }
+        });
+        
+        // Handle assignment submission
+        if (submitButton) {
+          submitButton.addEventListener('click', async function() {
+            const assignmentSelect = document.getElementById('assignment-select');
+            const assignmentNotes = document.getElementById('assignment-notes');
+            
+            if (!assignmentSelect.value) {
+              alert('Please select an assignment');
+              return;
+            }
+            
+            if (!fileUpload.files.length) {
+              alert('Please upload a file');
+              return;
+            }
+            
+            // Show loader
+            loader.style.display = 'inline-block';
+            submitButton.disabled = true;
+            
+            try {
+              const result = await mockAPI.submitAssignment(
+                assignmentSelect.value,
+                fileUpload.files[0],
+                assignmentNotes.value
+              );
+              
+              if (result.success) {
+                alert('Assignment submitted successfully!');
+                
+                // Reset form
+                assignmentSelect.value = '';
+                assignmentNotes.value = '';
+                fileUpload.value = '';
+                dropZone.innerHTML = `
+                  <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
+                  <p class="text-gray-600 mb-1">Drag and drop files here or click to upload</p>
+                  <p class="text-xs text-gray-500">(Maximum file size: 25MB)</p>
+                `;
+                
+                // Reload assignments data
+                loadAssignmentsData();
+              } else {
+                alert('Error submitting assignment: ' + result.message);
+              }
+            } catch (error) {
+              console.error('Error submitting assignment:', error);
+              alert('Error submitting assignment. Please try again.');
+            } finally {
+              // Hide loader
+              loader.style.display = 'none';
+              submitButton.disabled = false;
+            }
+          });
+        }
+      }
+    }
+    
+    // Setup announcement read status
+    function setupAnnouncementReadStatus() {
+      const announcements = document.querySelectorAll('[data-announcement-id]');
+      let unreadCount = 0;
+      
+      announcements.forEach(announcement => {
+        const id = announcement.getAttribute('data-announcement-id');
+        const isRead = localStorage.getItem(`announcement-${id}`) === 'read';
+        
+        const badge = announcement.querySelector('.bg-red-100');
+        if (badge) {
+          if (isRead) {
+            badge.style.display = 'none';
+          } else {
+            unreadCount++;
+          }
+        }
+        
+        announcement.addEventListener('click', function() {
+          if (!isRead) {
+            localStorage.setItem(`announcement-${id}`, 'read');
+            
+            const badge = this.querySelector('.bg-red-100');
+            if (badge) {
+              badge.style.display = 'none';
+              unreadCount--;
+              updateAnnouncementBadge();
+            }
+          }
+        });
+      });
+      
+      function updateAnnouncementBadge() {
+        const badge = document.getElementById('announcements-badge');
+        
+        if (unreadCount > 0) {
+          badge.textContent = unreadCount;
+          badge.style.display = 'flex';
+        } else {
+          badge.style.display = 'none';
+        }
+      }
+      
+      updateAnnouncementBadge();
+    }
+    
+    // Setup message conversation loading
+    function setupMessageConversation() {
+      const messageContacts = document.querySelectorAll('[data-teacher-id]');
+      
+      messageContacts.forEach(contact => {
+        contact.addEventListener('click', function() {
+          // Remove active class from all contacts
+          messageContacts.forEach(c => c.classList.remove('bg-indigo-50'));
+          
+          // Add active class to clicked contact
+          this.classList.add('bg-indigo-50');
+          
+          // Extract teacher ID from the contact
+          const teacherId = this.getAttribute('data-teacher-id');
+          
+          // Load conversation
+          loadConversation(teacherId);
+        });
+      });
+    }
+    
+    // Load conversation with a specific teacher
+    async function loadConversation(teacherId) {
+      try {
+        const conversation = await mockAPI.getMessage(teacherId);
+        
+        // Update conversation header
+        document.getElementById('current-teacher-initials').textContent = conversation.teacherId;
+        document.getElementById('current-teacher-name').textContent = conversation.teacherName;
+        document.getElementById('current-teacher-status').textContent = conversation.online ? 'Online now' : 'Offline';
+        
+        // Update conversation view
+        updateConversationView(conversation);
+      } catch (error) {
+        console.error('Error loading conversation:', error);
+      }
+    }
+    
+    // Update conversation view
+    function updateConversationView(conversation) {
+      const messageContainer = document.getElementById('message-container');
+      if (!messageContainer) return;
+      
+      // Clear existing messages
+      messageContainer.innerHTML = '';
+      
+      // Add messages
+      const messagesHtml = conversation.conversation.map(msg => {
+        const isSent = msg.sender === 'student';
+        return `
+          <div class="message-bubble ${isSent ? 'message-sent' : 'message-received'}">
+            <p>${msg.message}</p>
+            <div class="text-xs ${isSent ? 'text-gray-400' : 'text-gray-500'} mt-1">${msg.time}</div>
+          </div>
+        `;
+      }).join('');
+      
+      messageContainer.innerHTML = `<div class="flex flex-col space-y-4">${messagesHtml}</div>`;
+      
+      // Scroll to bottom
+      messageContainer.scrollTop = messageContainer.scrollHeight;
+    }
+    
+    // Setup message sending
+    function setupMessageSending() {
+      const messageInput = document.getElementById('message-input');
+      const sendButton = document.getElementById('send-message-btn');
+      
+      if (messageInput && sendButton) {
+        const sendMessage = async () => {
+          const message = messageInput.value.trim();
+          if (!message) return;
+          
+          // Get current teacher ID from active conversation
+          const activeContact = document.querySelector('[data-teacher-id].bg-indigo-50');
+          if (!activeContact) return;
+          
+          const teacherId = activeContact.getAttribute('data-teacher-id');
+          
+          try {
+            const result = await mockAPI.sendMessage(teacherId, message);
+            
+            if (result.success) {
+              // Clear input
+              messageInput.value = '';
+              
+              // Reload conversation
+              loadConversation(teacherId);
+            } else {
+              alert('Error sending message: ' + result.message);
+            }
+          } catch (error) {
+            console.error('Error sending message:', error);
+            alert('Error sending message. Please try again.');
+          }
+        };
+        
+        sendButton.addEventListener('click', sendMessage);
+        
+        messageInput.addEventListener('keypress', function(e) {
+          if (e.key === 'Enter') {
+            sendMessage();
+          }
+        });
+      }
+    }
+    
+    // Initialize attendance chart
+    function initializeAttendanceChart(historyData) {
+      if (!document.getElementById('attendance-chart')) return;
+      
+      const ctx = document.getElementById('attendance-chart').getContext('2d');
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: historyData.map(item => item.month),
+          datasets: [{
+            label: 'Attendance %',
+            data: historyData.map(item => item.percentage),
+            backgroundColor: 'rgba(79, 70, 229, 0.2)',
+            borderColor: 'rgba(79, 70, 229, 1)',
+            borderWidth: 2,
+            tension: 0.3,
+            pointBackgroundColor: 'white',
+            pointBorderColor: 'rgba(79, 70, 229, 1)',
+            pointBorderWidth: 2,
+            pointRadius: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: false,
+              min: 80,
+              max: 100
+            }
+          },
+          plugins: {
+            legend: {
+              display: false
+            }
+          }
+        }
+      });
+    }
+    
+    // Update grade gauge
+    function updateGradeGauge(percentage) {
+      const gaugeFill = document.getElementById('grade-gauge');
+      const gaugeNeedle = document.getElementById('grade-needle');
+      
+      if (gaugeFill && gaugeNeedle) {
+        // Calculate rotation (0% = 0deg, 100% = 180deg)
+        const rotation = (percentage / 100) * 180;
+        
+        // Apply rotation
+        gaugeFill.style.transform = `rotate(${rotation}deg)`;
+        gaugeNeedle.style.transform = `rotate(${rotation}deg)`;
+      }
+    }
+  </script>
+</body>
+</html>
